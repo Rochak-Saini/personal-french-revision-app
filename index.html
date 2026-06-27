@@ -813,6 +813,8 @@ function renderHome() {
 // ═══════════════════════════════════════════
 function buildQueue(mode, cat) {
   let indices = CARDS.map((_, i) => i);
+  
+  // FIX: Ensure we properly isolate by category if a specific category was clicked
   if (cat) indices = indices.filter(i => CARDS[i].cat === cat);
 
   if (mode === 'weak') indices = indices.filter(i => ['learning','almost'].includes(progress[i]));
