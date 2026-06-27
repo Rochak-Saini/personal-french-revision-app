@@ -726,6 +726,7 @@ const CAT_CONFIG = {
 
 // Helper function to safely get config labels/icons for any dynamic category
 function getCategoryMeta(catKey) {
+  if (!catKey) return { label: 'All cards', icon: '🃏' };
   if (CAT_CONFIG[catKey]) return CAT_CONFIG[catKey];
   // Dynamic fallback formatting for unconfigured metadata tags
   const cleanLabel = catKey.charAt(0).toUpperCase() + catKey.slice(1);
