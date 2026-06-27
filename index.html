@@ -28,6 +28,26 @@
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
+  :root[data-theme="light"] {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface2: #eef2ff;
+    --surface3: #e5ebf8;
+    --border: #d7def0;
+    --text: #182033;
+    --muted: #64708b;
+    --accent: #5b5cf2;
+    --accent-dim: #dfe1ff;
+    --new: #f0f2ff;
+    --new-text: #4f58b8;
+    --learning: #fff3e0;
+    --learning-text: #b45b00;
+    --almost: #eaf5ff;
+    --almost-text: #2569b8;
+    --got-it: #e8f9ef;
+    --got-it-text: #16714d;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   body {
@@ -119,7 +139,11 @@
   .mode-btn .mode-title { font-size: 14px; font-weight: 700; }
   .mode-btn .mode-desc { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .mode-btn.full-width { grid-column: 1 / -1; }
-  .mode-btn.accent { border-color: var(--accent-dim); background: #1a1830; }
+  .mode-btn.accent {
+    border-color: var(--accent-dim);
+    background: var(--accent-dim);
+    color: var(--text);
+  }
 
   .categories-section { padding: 0 20px 20px; }
   .category-list { display: flex; flex-direction: column; gap: 6px; }
@@ -529,6 +553,7 @@
     <button class="nav-btn" onclick="showScreen('home')">Home</button>
     <button class="nav-btn" onclick="showScreen('browse')">Browse</button>
     <button class="nav-btn" onclick="showScreen('settings')">Settings</button>
+    <button class="nav-btn" id="nav-theme-btn" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">🌙</button>
   </div>
 </nav>
 
@@ -683,6 +708,13 @@
     </div>
     <div class="setting-row">
       <div class="setting-info">
+        <div class="setting-title">Theme</div>
+        <div class="setting-desc">Switch between dark and light mode</div>
+      </div>
+      <button class="toggle" id="toggle-theme" onclick="toggleTheme()"></button>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info">
         <div class="setting-title">Include new cards in sessions</div>
         <div class="setting-desc">New cards are skipped by default</div>
       </div>
@@ -753,7 +785,7 @@ function getCategoryMeta(catKey) {
 // STATE
 // ═══════════════════════════════════════════
 let progress = {};   
-let settings = { reverse: false, includeNew: false, requeue: true, showConj: true };
+let settings = { reverse: false, includeNew: false, requeue: true, showConj: true, theme: 'dark' };
 let session = { queue: [], idx: 0, flipped: false, mode: '', cat: '', results: {} };
 let conjCache = {};
 
@@ -764,11 +796,24 @@ function loadStorage() {
     const s = localStorage.getItem('fr_settings');
     if (s) settings = { ...settings, ...JSON.parse(s) };
   } catch(e) {}
+  if (!['dark','light'].includes(settings.theme)) settings.theme = 'dark';
   CARDS.forEach((_, i) => { if (!progress[i]) progress[i] = 'new'; });
 }
 
 function saveProgress() { localStorage.setItem('fr_progress', JSON.stringify(progress)); }
 function saveSettings() { localStorage.setItem('fr_settings', JSON.stringify(settings)); }
+
+function applyTheme() {
+  const theme = settings.theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  const toggle = document.getElementById('toggle-theme');
+  const navBtn = document.getElementById('nav-theme-btn');
+  if (toggle) toggle.classList.toggle('on', theme === 'light');
+  if (navBtn) {
+    navBtn.textContent = theme === 'light' ? '☀️' : '🌙';
+    navBtn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+  }
+}
 
 // ═══════════════════════════════════════════
 // NAVIGATION
@@ -834,7 +879,16 @@ function buildQueue(mode, cat) {
   // FIX: Ensure we properly isolate by category if a specific category was clicked
   if (cat) indices = indices.filter(i => CARDS[i].cat === cat);
 
-  if (mode === 'weak') indices = indices.filter(i => ['learning','almost'].includes(progress[i]));
+  if (mode === 'weak') {
+    indices = indices.filter(i => ['learning','almost'].includes(progress[i]));
+    if (indices.length === 0) {
+      indices = indices.filter(i => progress[i] !== 'gotit');
+      if (indices.length === 0) {
+        indices = CARDS.map((_, i) => i);
+        if (cat) indices = indices.filter(i => CARDS[i].cat === cat);
+      }
+    }
+  }
   else if (mode === 'new') indices = indices.filter(i => progress[i] === 'new');
   else if (mode === 'gotit') indices = indices.filter(i => progress[i] === 'gotit');
   else if (mode === 'all' || mode === 'category') {
@@ -1105,11 +1159,19 @@ function renderSettings() {
     const el = document.getElementById(ids[i]);
     if (el) el.classList.toggle('on', !!settings[k]);
   });
+  applyTheme();
 }
 
 function toggleSetting(key) {
   settings[key] = !settings[key];
   saveSettings();
+  renderSettings();
+}
+
+function toggleTheme() {
+  settings.theme = settings.theme === 'light' ? 'dark' : 'light';
+  saveSettings();
+  applyTheme();
   renderSettings();
 }
 
@@ -1163,7 +1225,9 @@ document.getElementById('card-scene').addEventListener('touchend', e => {
 // INIT
 // ═══════════════════════════════════════════
 loadStorage();
+applyTheme();
 renderHome();
+renderSettings();
 </script>
 </body>
 </html>
