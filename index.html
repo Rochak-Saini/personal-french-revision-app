@@ -187,6 +187,8 @@
     aspect-ratio: 3/2;
     cursor: pointer;
     position: relative;
+    touch-action: manipulation;
+    user-select: none;
   }
 
   .card-inner {
@@ -206,13 +208,23 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 28px 24px;
+    padding: 52px 18px 20px;
     border: 1px solid var(--border);
     text-align: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .card-face > * {
+    width: 100%;
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
-  .card-front { background: var(--surface); }
-  .card-back { background: var(--surface2); transform: rotateY(180deg); }
+  .card-front { background: var(--surface); justify-content: center; }
+  .card-back { background: var(--surface2); transform: rotateY(180deg); justify-content: flex-start; }
 
   .card-category-tag {
     position: absolute;
@@ -880,15 +892,17 @@ function renderCard() {
   const frontText = settings.reverse ? card.en : card.fr;
   const backText = settings.reverse ? card.fr : card.en;
   const catLabel = getCategoryMeta(card.cat).label;
+  const front = document.getElementById('card-front');
+  const back = document.getElementById('card-back');
 
-  document.getElementById('card-front').innerHTML = `
+  front.innerHTML = `
     <div class="card-category-tag">${catLabel}</div>
     <div class="card-state-tag" style="background:${bg};color:${fg}">${stateLabels[state]}</div>
     <div class="card-main-text">${frontText}</div>
     <div class="card-hint">Tap to reveal</div>
   `;
 
-  document.getElementById('card-back').innerHTML = `
+  back.innerHTML = `
     <div class="card-category-tag">${catLabel}</div>
     <div class="card-state-tag" style="background:${bg};color:${fg}">${stateLabels[state]}</div>
     <div class="card-answer-text">${backText}</div>
@@ -971,6 +985,7 @@ const HARDCODED_CONJ = {
 };
 
 const PRONOUNS = ['je','tu','il/elle','nous','vous','ils/elles'];
+let conjRequestToken = 0;
 
 function renderConjTable(conj) {
   if (!conj) return '<div class="conj-loading">Conjugation not available</div>';
@@ -986,13 +1001,17 @@ function renderConjTable(conj) {
 }
 
 function fetchConjugation(verbFr, cardIdx) {
+  const requestId = ++conjRequestToken;
   const verbKey = verbFr.split('|')[0].trim();
+
   if (HARDCODED_CONJ[verbKey]) {
+    if (requestId !== conjRequestToken) return;
     const area = document.getElementById('conj-area');
     if (area) area.outerHTML = renderConjTable(HARDCODED_CONJ[verbKey]);
     return;
   }
   if (conjCache[verbKey]) {
+    if (requestId !== conjRequestToken) return;
     const area = document.getElementById('conj-area');
     if (area) area.outerHTML = renderConjTable(conjCache[verbKey]);
     return;
@@ -1001,10 +1020,12 @@ function fetchConjugation(verbFr, cardIdx) {
   fetch(`https://api.dictionaryapi.dev/api/v2/entries/fr/${encodeURIComponent(clean)}`)
     .then(r => r.json())
     .then(data => {
+      if (requestId !== conjRequestToken) return;
       const area = document.getElementById('conj-area');
       if (area) area.outerHTML = '<div class="conj-loading">Conjugation not available via API for this verb</div>';
     })
     .catch(() => {
+      if (requestId !== conjRequestToken) return;
       const area = document.getElementById('conj-area');
       if (area) area.outerHTML = '<div class="conj-loading">Could not load conjugation</div>';
     });
