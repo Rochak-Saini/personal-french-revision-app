@@ -220,9 +220,15 @@
     width: 100%; height: 100%;
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
   }
   .card-inner.flipped { transform: rotateY(180deg); }
+  .card-inner.is-transitioning {
+    opacity: 0;
+    transform: rotateY(0deg) scale(0.97);
+    pointer-events: none;
+  }
+  .card-inner.is-transitioning .card-face { opacity: 0; }
 
   .card-face {
     position: absolute; inset: 0;
@@ -934,7 +940,9 @@ function renderCard() {
   const card = CARDS[cardIdx];
   const state = progress[cardIdx] || 'new';
   session.flipped = false;
-  document.getElementById('card-inner').classList.remove('flipped');
+  const cardInner = document.getElementById('card-inner');
+  cardInner.classList.remove('flipped');
+  cardInner.classList.remove('is-transitioning');
 
   document.getElementById('card-counter').textContent = `${idx + 1} / ${total}`;
   document.getElementById('progress-fill').style.width = `${(idx / total) * 100}%`;
@@ -990,7 +998,16 @@ function markCard(state) {
   }
 
   session.idx++;
-  renderCard();
+  const cardInner = document.getElementById('card-inner');
+  cardInner.classList.remove('flipped');
+  cardInner.classList.add('is-transitioning');
+  cardInner.style.pointerEvents = 'none';
+
+  window.setTimeout(() => {
+    cardInner.classList.remove('is-transitioning');
+    cardInner.style.pointerEvents = '';
+    renderCard();
+  }, 480);
 }
 
 function showComplete() {
