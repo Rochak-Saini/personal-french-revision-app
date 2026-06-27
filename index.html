@@ -211,13 +211,8 @@
     text-align: center;
   }
 
-  .card-front {
-    background: var(--surface);
-  }
-  .card-back {
-    background: var(--surface2);
-    transform: rotateY(180deg);
-  }
+  .card-front { background: var(--surface); }
+  .card-back { background: var(--surface2); transform: rotateY(180deg); }
 
   .card-category-tag {
     position: absolute;
@@ -247,10 +242,7 @@
     line-height: 1.2;
     margin-bottom: 8px;
   }
-  .card-sub-text {
-    font-size: 13px;
-    color: var(--muted);
-  }
+  .card-sub-text { color: var(--muted); font-size: 13px; }
   .card-hint { font-size: 12px; color: var(--muted); margin-top: 20px; opacity: 0.6; }
 
   .card-answer-text {
@@ -259,12 +251,7 @@
     letter-spacing: -0.5px;
     margin-bottom: 8px;
   }
-  .card-notes {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
-    font-style: italic;
-  }
+  .card-notes { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
 
   /* CONJUGATION TABLE */
   .conj-table {
@@ -521,14 +508,13 @@
 <body>
 
 <nav>
-  <div class="nav-logo">Fran<span>çais</span></div>
+  <div class="nav-logo" onclick="showScreen('home')" style="cursor:pointer">Fran<span>çais</span></div>
   <div class="nav-actions">
     <button class="nav-btn" onclick="showScreen('browse')">Browse</button>
     <button class="nav-btn" onclick="showScreen('settings')">Settings</button>
   </div>
 </nav>
 
-<!-- HOME -->
 <div class="screen active" id="screen-home">
   <div class="home-header">
     <h1>Ready to revise?</h1>
@@ -565,7 +551,7 @@
       <div class="mode-btn" onclick="startSession('all')">
         <div class="mode-icon">🃏</div>
         <div class="mode-title">Full deck</div>
-        <div class="mode-desc">All 569 cards shuffled</div>
+        <div class="mode-desc">All cards shuffled</div>
       </div>
       <div class="mode-btn" onclick="startSession('new')">
         <div class="mode-icon">✨</div>
@@ -586,7 +572,6 @@
   </div>
 </div>
 
-<!-- STUDY -->
 <div class="screen" id="screen-study">
   <div class="study-header">
     <button class="back-btn" onclick="exitStudy()">←</button>
@@ -622,7 +607,6 @@
   </div>
 </div>
 
-<!-- COMPLETE -->
 <div class="screen" id="screen-complete">
   <div class="complete-screen">
     <div class="complete-icon">🎉</div>
@@ -654,7 +638,6 @@
   </div>
 </div>
 
-<!-- BROWSE -->
 <div class="screen" id="screen-browse">
   <div class="browse-controls">
     <input class="search-input" type="search" placeholder="Search cards…" id="search-input" oninput="renderBrowse()">
@@ -672,7 +655,6 @@
   <div class="browse-list" id="browse-list"></div>
 </div>
 
-<!-- SETTINGS -->
 <div class="screen" id="screen-settings">
   <div class="settings-body">
     <div class="setting-row">
@@ -709,61 +691,16 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="cards.js"></script>
+
 <script>
-// ═══════════════════════════════════════════
-// CARD DATA — 569 cards across 15 categories
-// ═══════════════════════════════════════════
-const CARDS = [
-  // GREETINGS & PHRASES (35)
-  ...["Bonjour|Hello / Good morning|greetings","Bonsoir|Good evening|greetings","Bonne nuit|Good night|greetings","Salut|Hi / Bye (informal)|greetings","Au revoir|Goodbye|greetings","À bientôt|See you soon|greetings","À demain|See you tomorrow|greetings","À tout à l'heure|See you later (same day)|greetings","S'il vous plaît|Please (formal)|greetings","S'il te plaît|Please (informal)|greetings","Merci|Thank you|greetings","Merci beaucoup|Thank you very much|greetings","De rien|You're welcome|greetings","Avec plaisir|With pleasure|greetings","Excusez-moi|Excuse me (formal)|greetings","Pardon|Sorry / Pardon|greetings","Je suis désolé / désolée|I'm sorry|greetings","Ce n'est pas grave|It doesn't matter|greetings","Je ne comprends pas|I don't understand|greetings","Pouvez-vous répéter ?|Can you repeat?|greetings","Plus lentement, s'il vous plaît|More slowly, please|greetings","Vous parlez anglais ?|Do you speak English?|greetings","Comment vous appelez-vous ?|What is your name? (formal)|greetings","Comment tu t'appelles ?|What is your name? (informal)|greetings","Je m'appelle…|My name is…|greetings","Ça va ?|How are you? (informal)|greetings","Ça va bien, merci|I'm fine, thank you|greetings","Comme ci comme ça|So-so|greetings","Pas mal|Not bad|greetings","Enchanté / Enchantée|Nice to meet you|greetings","Bienvenue|Welcome|greetings","Bonne chance|Good luck|greetings","Bon appétit|Enjoy your meal|greetings","Joyeux anniversaire|Happy birthday|greetings","Félicitations|Congratulations|greetings"].map(parseLine),
-
-  // NUMBERS & TIME (58)
-  ...["zéro|0|numbers","un, deux, trois|1, 2, 3|numbers","quatre, cinq, six|4, 5, 6|numbers","sept, huit, neuf|7, 8, 9|numbers","dix, onze, douze|10, 11, 12|numbers","treize, quatorze, quinze|13, 14, 15|numbers","seize, dix-sept, dix-huit|16, 17, 18|numbers","dix-neuf, vingt|19, 20|numbers","vingt et un|21|numbers","trente|30|numbers","quarante|40|numbers","cinquante|50|numbers","soixante|60|numbers","soixante-dix|70|numbers","soixante et onze|71|numbers","quatre-vingts|80|numbers","quatre-vingt-un|81|numbers","quatre-vingt-dix|90|numbers","cent|100|numbers","mille|1000|numbers","premier / première|first|numbers","deuxième|second|numbers","troisième|third|numbers","lundi|Monday|numbers","mardi|Tuesday|numbers","mercredi|Wednesday|numbers","jeudi|Thursday|numbers","vendredi|Friday|numbers","samedi|Saturday|numbers","dimanche|Sunday|numbers","janvier|January|numbers","février|February|numbers","mars|March|numbers","avril|April|numbers","mai|May|numbers","juin|June|numbers","juillet|July|numbers","août|August|numbers","septembre|September|numbers","octobre|October|numbers","novembre|November|numbers","décembre|December|numbers","aujourd'hui|today|numbers","demain|tomorrow|numbers","hier|yesterday|numbers","avant-hier|the day before yesterday|numbers","après-demain|the day after tomorrow|numbers","le matin|the morning|numbers","l'après-midi|the afternoon|numbers","le soir|the evening|numbers","la nuit|the night|numbers","Quelle heure est-il ?|What time is it?|numbers","Il est… heures|It is… o'clock|numbers","Il est midi|It is midday|numbers","Il est minuit|It is midnight|numbers","et quart|quarter past|numbers","et demie|half past|numbers","moins le quart|quarter to|numbers"].map(parseLine),
-
-  // FAMILY & PEOPLE (31)
-  ...["la mère|mother|family","le père|father|family","la sœur|sister|family","le frère|brother|family","la grand-mère|grandmother|family","le grand-père|grandfather|family","la petite-fille|granddaughter|family","le petit-fils|grandson|family","la tante|aunt|family","l'oncle|uncle|family","la cousine|cousin (f)|family","le cousin|cousin (m)|family","la fille|daughter / girl|family","le fils|son|family","l'enfant|child|family","le bébé|baby|family","le mari|husband|family","la femme|wife / woman|family","le petit ami|boyfriend|family","la petite amie|girlfriend|family","l'ami / l'amie|friend (m/f)|family","le collègue|colleague|family","le professeur|teacher|family","le médecin|doctor|family","l'homme|man|family","la personne|person|family","les gens|people|family","jeune|young|family","âgé / âgée|elderly|family","célibataire|single|family","marié / mariée|married|family"].map(parseLine),
-
-  // FOOD & DRINK (44)
-  ...["le pain|bread|food","la baguette|baguette|food","le croissant|croissant|food","le fromage|cheese|food","le beurre|butter|food","la viande|meat|food","le poulet|chicken|food","le bœuf|beef|food","le porc|pork|food","le poisson|fish|food","les crevettes|prawns / shrimp|food","les légumes|vegetables|food","la pomme de terre|potato|food","la tomate|tomato|food","la carotte|carrot|food","l'oignon|onion|food","les fruits|fruit|food","la pomme|apple|food","la banane|banana|food","l'orange|orange|food","la fraise|strawberry|food","la salade|salad|food","le riz|rice|food","les pâtes|pasta|food","la soupe|soup|food","l'œuf|egg|food","le sucre|sugar|food","le sel|salt|food","l'huile|oil|food","l'eau|water|food","l'eau gazeuse|sparkling water|food","le café|coffee|food","le thé|tea|food","le jus d'orange|orange juice|food","le vin|wine|food","la bière|beer|food","le lait|milk|food","le petit-déjeuner|breakfast|food","le déjeuner|lunch|food","le dîner|dinner|food","J'ai faim|I'm hungry|food","J'ai soif|I'm thirsty|food","C'est délicieux|It's delicious|food","L'addition, s'il vous plaît|The bill, please|food"].map(parseLine),
-
-  // PLACES & DIRECTIONS (41)
-  ...["la ville|city / town|places","le village|village|places","la campagne|countryside|places","la rue|street|places","l'avenue|avenue|places","la place|square / plaza|places","la maison|house|places","l'appartement|apartment|places","l'immeuble|building|places","l'école|school|places","le collège|middle school|places","le lycée|high school|places","l'université|university|places","le bureau|office|places","le magasin|shop|places","le supermarché|supermarket|places","le marché|market|places","la pharmacie|pharmacy|places","l'hôpital|hospital|places","la banque|bank|places","la poste|post office|places","la bibliothèque|library|places","l'église|church|places","le musée|museum|places","le parc|park|places","la gare|train station|places","l'aéroport|airport|places","le métro|metro / underground|places","le restaurant|restaurant|places","le café|café|places","l'hôtel|hotel|places","à gauche|to the left|places","à droite|to the right|places","tout droit|straight ahead|places","près de|near / close to|places","loin de|far from|places","en face de|opposite|places","au coin de|on the corner of|places","au bout de|at the end of|places","au premier étage|on the first floor|places","au rez-de-chaussée|on the ground floor|places"].map(parseLine),
-
-  // COLOURS & ADJECTIVES (45)
-  ...["rouge|red|adjectives","bleu / bleue|blue|adjectives","vert / verte|green|adjectives","jaune|yellow|adjectives","noir / noire|black|adjectives","blanc / blanche|white|adjectives","rose|pink|adjectives","orange|orange (invariable)|adjectives","gris / grise|grey|adjectives","violet / violette|purple|adjectives","marron|brown (invariable)|adjectives","beige|beige (invariable)|adjectives","grand / grande|big / tall|adjectives","petit / petite|small|adjectives","gros / grosse|fat / large|adjectives","mince|slim|adjectives","long / longue|long|adjectives","court / courte|short (length)|adjectives","haut / haute|high / tall|adjectives","bas / basse|low|adjectives","bon / bonne|good|adjectives","mauvais / mauvaise|bad|adjectives","beau / belle|beautiful|adjectives","joli / jolie|pretty|adjectives","laid / laide|ugly|adjectives","nouveau / nouvelle|new|adjectives","vieux / vieille|old|adjectives","jeune|young|adjectives","chaud / chaude|hot|adjectives","froid / froide|cold|adjectives","rapide|fast (invariable)|adjectives","lent / lente|slow|adjectives","facile|easy (invariable)|adjectives","difficile|hard (invariable)|adjectives","cher / chère|expensive|adjectives","gratuit / gratuite|free|adjectives","sympa|nice (invariable)|adjectives","content / contente|happy|adjectives","triste|sad (invariable)|adjectives","fatigué / fatiguée|tired|adjectives","occupé / occupée|busy|adjectives","fort / forte|strong|adjectives","faible|weak (invariable)|adjectives","plein / pleine|full|adjectives","vide|empty (invariable)|adjectives"].map(parseLine),
-
-  // CORE VERBS (30)
-  ...["être|to be|verbs","avoir|to have|verbs","aller|to go|verbs","faire|to do / make|verbs","vouloir|to want|verbs","pouvoir|to be able to|verbs","devoir|to have to|verbs","savoir|to know (a fact)|verbs","connaître|to know (a person/place)|verbs","voir|to see|verbs","dire|to say|verbs","mettre|to put|verbs","prendre|to take|verbs","venir|to come|verbs","partir|to leave|verbs","sortir|to go out|verbs","dormir|to sleep|verbs","finir|to finish|verbs","choisir|to choose|verbs","parler|to speak|verbs","manger|to eat|verbs","habiter|to live (somewhere)|verbs","travailler|to work|verbs","aimer|to like / love|verbs","écouter|to listen|verbs","regarder|to watch|verbs","chercher|to look for|verbs","acheter|to buy|verbs","s'appeler|to be called|verbs","se lever|to get up|verbs"].map(parseLine),
-
-  // BODY (25)
-  ...["la tête|head|body","le visage|face|body","les cheveux|hair|body","les yeux|eyes|body","l'œil|eye|body","le nez|nose|body","la bouche|mouth|body","l'oreille|ear|body","les dents|teeth|body","le cou|neck|body","l'épaule|shoulder|body","le bras|arm|body","la main|hand|body","le doigt|finger|body","la jambe|leg|body","le pied|foot|body","le dos|back|body","le ventre|stomach / belly|body","le cœur|heart|body","J'ai mal à la tête|I have a headache|body","J'ai mal au ventre|I have a stomachache|body","Je suis malade|I am sick|body","Je me sens bien|I feel well|body","fatigué / fatiguée|tired|body","en bonne santé|in good health|body"].map(parseLine),
-
-  // CLOTHING (25)
-  ...["les vêtements|clothes|clothing","la chemise|shirt|clothing","le t-shirt|t-shirt|clothing","le pull|jumper / sweater|clothing","la veste|jacket|clothing","le manteau|coat|clothing","le pantalon|trousers|clothing","le jean|jeans|clothing","la jupe|skirt|clothing","la robe|dress|clothing","le short|shorts|clothing","les chaussures|shoes|clothing","les baskets|trainers / sneakers|clothing","les bottes|boots|clothing","les chaussettes|socks|clothing","le chapeau|hat|clothing","l'écharpe|scarf|clothing","les gants|gloves|clothing","porter|to wear|clothing","mettre|to put on|clothing","Je porte…|I am wearing…|clothing","Quelle taille ?|What size?|clothing","grand / moyen / petit|large / medium / small|clothing","ça me va|it suits me / it fits me|clothing","C'est trop grand|It's too big|clothing"].map(parseLine),
-
-  // HOME (25)
-  ...["la maison|house|home","l'appartement|apartment|home","la chambre|bedroom|home","la salle de bain|bathroom|home","la cuisine|kitchen|home","le salon|living room|home","la salle à manger|dining room|home","les toilettes|toilet|home","le jardin|garden|home","le balcon|balcony|home","la porte|door|home","la fenêtre|window|home","le lit|bed|home","la table|table|home","la chaise|chair|home","le canapé|sofa|home","l'armoire|wardrobe|home","le réfrigérateur|fridge|home","la télévision|television|home","l'ordinateur|computer|home","le téléphone|phone|home","habiter|to live (somewhere)|home","J'habite à…|I live in…|home","au premier étage|on the first floor|home","C'est grand / petit|It's big / small|home"].map(parseLine),
-
-  // TRANSPORT (20)
-  ...["la voiture|car|transport","le bus|bus|transport","le train|train|transport","le métro|metro / underground|transport","le vélo|bicycle|transport","la moto|motorbike|transport","l'avion|plane|transport","le taxi|taxi|transport","le bateau|boat|transport","à pied|on foot|transport","prendre le bus|to take the bus|transport","conduire|to drive|transport","le billet|ticket|transport","l'arrêt de bus|bus stop|transport","la gare|train station|transport","l'aéroport|airport|transport","partir|to leave / depart|transport","arriver|to arrive|transport","À quelle heure part le train ?|What time does the train leave?|transport","C'est loin ?|Is it far?|transport"].map(parseLine),
-
-  // SCHOOL & WORK (25)
-  ...["l'école|school|school","la classe|classroom|school","le cours|lesson / class|school","le professeur|teacher|school","l'élève|pupil|school","l'étudiant / l'étudiante|student (m/f)|school","le livre|book|school","le cahier|notebook|school","le stylo|pen|school","le crayon|pencil|school","le bureau|desk / office|school","le cartable|school bag|school","les devoirs|homework|school","l'examen|exam|school","la note|grade / mark|school","travailler|to work|school","étudier|to study|school","apprendre|to learn|school","écrire|to write|school","lire|to read|school","le travail|work / job|school","le métier|profession|school","le collègue|colleague|school","Je travaille dans…|I work in…|school","Qu'est-ce que vous faites ?|What do you do for work?|school"].map(parseLine),
-
-  // WEATHER & SEASONS (20)
-  ...["la météo|the weather|weather","le temps|the weather / time|weather","le soleil|sun|weather","la pluie|rain|weather","le vent|wind|weather","la neige|snow|weather","le nuage|cloud|weather","il fait chaud|it's hot|weather","il fait froid|it's cold|weather","il fait beau|the weather is nice|weather","il pleut|it's raining|weather","il neige|it's snowing|weather","il y a du vent|it's windy|weather","il y a du soleil|it's sunny|weather","le printemps|spring|weather","l'été|summer|weather","l'automne|autumn|weather","l'hiver|winter|weather","Quel temps fait-il ?|What's the weather like?|weather","Il fait combien de degrés ?|What's the temperature?|weather"].map(parseLine),
-
-  // HOBBIES (25)
-  ...["les loisirs|hobbies / free time|hobbies","le sport|sport|hobbies","la musique|music|hobbies","la lecture|reading|hobbies","le cinéma|cinema|hobbies","la télévision|television|hobbies","le jeu vidéo|video game|hobbies","le dessin|drawing|hobbies","la cuisine|cooking|hobbies","la danse|dance|hobbies","le football|football|hobbies","la natation|swimming|hobbies","le tennis|tennis|hobbies","jouer|to play|hobbies","écouter de la musique|to listen to music|hobbies","regarder un film|to watch a film|hobbies","lire un livre|to read a book|hobbies","faire du sport|to do sport|hobbies","aller au cinéma|to go to the cinema|hobbies","J'aime…|I like…|hobbies","Je n'aime pas…|I don't like…|hobbies","J'adore…|I love…|hobbies","Je préfère…|I prefer…|hobbies","le week-end|the weekend|hobbies","pendant mon temps libre|in my free time|hobbies"].map(parseLine),
-
-  // SHOPPING (20)
-  ...["le magasin|shop|shopping","le marché|market|shopping","le supermarché|supermarket|shopping","la boulangerie|bakery|shopping","la pharmacie|pharmacy|shopping","acheter|to buy|shopping","vendre|to sell|shopping","payer|to pay|shopping","Combien ça coûte ?|How much does it cost?|shopping","C'est combien ?|How much is it?|shopping","C'est cher|It's expensive|shopping","C'est bon marché|It's cheap|shopping","la monnaie|change / coins|shopping","la carte bancaire|bank card|shopping","en espèces|in cash|shopping","Je voudrais…|I would like…|shopping","Vous avez… ?|Do you have…?|shopping","Quelle taille ?|What size?|shopping","Je regarde seulement|I'm just looking|shopping","L'addition / la note|The bill|shopping"].map(parseLine),
-];
-
 function parseLine(str) {
   const [fr, en, cat] = str.split('|');
-  return { fr, en, cat, isVerb: cat === 'verbs' };
+  return { fr: fr?.trim(), en: en?.trim(), cat: cat?.trim(), isVerb: cat?.trim() === 'verbs' };
 }
+
+// Map strings to structured data objects
+const CARDS = (typeof FLASHCARD_DATA !== 'undefined' ? FLASHCARD_DATA : []).map(parseLine);
 
 // ═══════════════════════════════════════════
 // CATEGORY CONFIG
@@ -786,10 +723,18 @@ const CAT_CONFIG = {
   shopping:  { label: 'Shopping',             icon: '🛍️' },
 };
 
+// Helper function to safely get config labels/icons for any dynamic category
+function getCategoryMeta(catKey) {
+  if (CAT_CONFIG[catKey]) return CAT_CONFIG[catKey];
+  // Dynamic fallback formatting for unconfigured metadata tags
+  const cleanLabel = catKey.charAt(0).toUpperCase() + catKey.slice(1);
+  return { label: cleanLabel, icon: '🃏' };
+}
+
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-let progress = {};   // cardIndex -> 'new'|'learning'|'almost'|'gotit'
+let progress = {};   
 let settings = { reverse: false, includeNew: false, requeue: true, showConj: true };
 let session = { queue: [], idx: 0, flipped: false, mode: '', cat: '', results: {} };
 let conjCache = {};
@@ -801,17 +746,11 @@ function loadStorage() {
     const s = localStorage.getItem('fr_settings');
     if (s) settings = { ...settings, ...JSON.parse(s) };
   } catch(e) {}
-  // Default all cards to 'new' if not set
   CARDS.forEach((_, i) => { if (!progress[i]) progress[i] = 'new'; });
 }
 
-function saveProgress() {
-  localStorage.setItem('fr_progress', JSON.stringify(progress));
-}
-
-function saveSettings() {
-  localStorage.setItem('fr_settings', JSON.stringify(settings));
-}
+function saveProgress() { localStorage.setItem('fr_progress', JSON.stringify(progress)); }
+function saveSettings() { localStorage.setItem('fr_settings', JSON.stringify(settings)); }
 
 // ═══════════════════════════════════════════
 // NAVIGATION
@@ -836,9 +775,14 @@ function renderHome() {
   document.getElementById('stat-gotit').textContent = counts.gotit;
   document.getElementById('home-sub').textContent = `${CARDS.length} cards · ${counts.gotit} mastered`;
 
+  // Dynamically extract unique active categories found in data
+  const dynamicCategories = Array.from(new Set(CARDS.map(c => c.cat))).filter(Boolean);
+
   const list = document.getElementById('category-list');
   list.innerHTML = '';
-  Object.entries(CAT_CONFIG).forEach(([key, cfg]) => {
+  
+  dynamicCategories.forEach(key => {
+    const cfg = getCategoryMeta(key);
     const indices = CARDS.map((c, i) => c.cat === key ? i : -1).filter(i => i >= 0);
     const catCounts = { new: 0, learning: 0, almost: 0, gotit: 0 };
     indices.forEach(i => catCounts[progress[i] || 'new']++);
@@ -875,13 +819,11 @@ function buildQueue(mode, cat) {
   else if (mode === 'gotit') indices = indices.filter(i => progress[i] === 'gotit');
   else if (mode === 'all' || mode === 'category') {
     if (!settings.includeNew) indices = indices.filter(i => progress[i] !== 'new');
-    if (indices.length === 0 && (mode === 'all' || mode === 'category')) {
-      // fallback — include new if nothing else
+    if (indices.length === 0) {
       indices = CARDS.map((_, i) => i);
       if (cat) indices = indices.filter(i => CARDS[i].cat === cat);
     }
   }
-
   return shuffle(indices);
 }
 
@@ -898,17 +840,14 @@ function startSession(mode, cat) {
     return;
   }
 
-  const modeLabels = { weak: 'Weak cards', all: 'Full deck', new: 'New cards', gotit: 'Known cards', category: CAT_CONFIG[cat]?.label };
+  const modeLabels = { weak: 'Weak cards', all: 'Full deck', new: 'New cards', gotit: 'Known cards', category: getCategoryMeta(cat).label };
   document.getElementById('study-title').textContent = modeLabels[mode] || 'Session';
   document.getElementById('reverse-btn').textContent = settings.reverse ? 'FR→EN' : 'EN→FR';
   showScreen('study');
   renderCard();
 }
 
-function reshuffleSession() {
-  startSession(session.mode, session.cat);
-}
-
+function reshuffleSession() { startSession(session.mode, session.cat); }
 function exitStudy() { showScreen('home'); }
 
 function renderCard() {
@@ -932,7 +871,7 @@ function renderCard() {
 
   const frontText = settings.reverse ? card.en : card.fr;
   const backText = settings.reverse ? card.fr : card.en;
-  const catLabel = CAT_CONFIG[card.cat]?.label || card.cat;
+  const catLabel = getCategoryMeta(card.cat).label;
 
   document.getElementById('card-front').innerHTML = `
     <div class="card-category-tag">${catLabel}</div>
@@ -965,7 +904,6 @@ function markCard(state) {
   session.results[state]++;
   saveProgress();
 
-  // Re-queue learning cards if requeue is on
   if (state === 'learning' && settings.requeue) {
     const remaining = session.queue.slice(session.idx + 1);
     if (!remaining.includes(cardIdx)) {
@@ -1014,7 +952,7 @@ const HARDCODED_CONJ = {
   'parler':  {présent:['parle','parles','parle','parlons','parlez','parlent'], passé:['ai parlé','as parlé','a parlé','avons parlé','avez parlé','ont parlé'], futur:['parlerai','parleras','parlera','parlerons','parlerez','parleront']},
   'manger':  {présent:['mange','manges','mange','mangeons','mangez','mangent'], passé:['ai mangé','as mangé','a mangé','avons mangé','avez mangé','ont mangé'], futur:['mangerai','mangeras','mangera','mangerons','mangerez','mangeront']},
   'habiter': {présent:['habite','habites','habite','habitons','habitez','habitent'], passé:['ai habité','as habité','a habité','avons habité','avez habité','ont habité'], futur:['habiterai','habiteras','habitera','habiterons','habiterez','habiteront']},
-  'travailler':{présent:['travaille','travailles','travaille','travaillons','travaillez','travaillent'], passé:['ai travaillé','as travaillé','a travaillé','avons travaillé','avez travaillé','ont travaillé'], futur:['travaillerai','travailleras','travaillera','travaillerons','travaillerez','travailleront']},
+  'travailler':{présent:['travaille','travailles','travaille','travaillons','travaillez','travaillent'], passé:['ai travaillé','as travaillé','a travaillé','avons travaillé','avez travaillé','ont travaillé'], futur:['travaillerai','travailleras','travaillera','travaillerons','twaillez','travailleront']},
   'aimer':   {présent:['aime','aimes','aime','aimons','aimez','aiment'], passé:['ai aimé','as aimé','a aimé','avons aimé','avez aimé','ont aimé'], futur:['aimerai','aimeras','aimera','aimerons','aimerez','aimeront']},
   'écouter': {présent:['écoute','écoutes','écoute','écoutons','écoutez','écoutent'], passé:['ai écouté','as écouté','a écouté','avons écouté','avez écouté','ont écouté'], futur:['écouterai','écouteras','écoutera','écouterons','écouterez','écouteront']},
   'regarder':{présent:['regarde','regardes','regarde','regardons','regardez','regardent'], passé:['ai regardé','as regardé','a regardé','avons regardé','avez regardé','ont regardé'], futur:['regarderai','regarderas','regardera','regarderons','regarderez','regarderont']},
@@ -1051,7 +989,6 @@ function fetchConjugation(verbFr, cardIdx) {
     if (area) area.outerHTML = renderConjTable(conjCache[verbKey]);
     return;
   }
-  // Try API for unknown verbs
   const clean = verbKey.replace(/^(se |s')/, '');
   fetch(`https://api.dictionaryapi.dev/api/v2/entries/fr/${encodeURIComponent(clean)}`)
     .then(r => r.json())
@@ -1073,12 +1010,12 @@ function renderBrowse() {
   const catF = document.getElementById('cat-filter').value;
   const stateF = document.getElementById('state-filter').value;
 
-  // Populate category filter once
   const cf = document.getElementById('cat-filter');
   if (cf.options.length === 1) {
-    Object.entries(CAT_CONFIG).forEach(([k, v]) => {
+    const activeCategories = Array.from(new Set(CARDS.map(c => c.cat))).filter(Boolean);
+    activeCategories.forEach(k => {
       const o = document.createElement('option');
-      o.value = k; o.textContent = v.label;
+      o.value = k; o.textContent = getCategoryMeta(k).label;
       cf.appendChild(o);
     });
   }
@@ -1104,7 +1041,7 @@ function renderBrowse() {
         <div class="browse-french">${card.fr}</div>
         <div class="browse-english">${card.en}</div>
       </div>
-      <div class="browse-cat">${CAT_CONFIG[card.cat]?.icon || ''}</div>
+      <div class="browse-cat">${getCategoryMeta(card.cat).icon || ''}</div>
       <div class="state-pill ${pillClass[state]}" data-idx="${i}">${stateLabels[state]}</div>
     `;
     row.querySelector('.state-pill').addEventListener('click', (e) => {
